@@ -1,0 +1,2442 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title> Hands-On Deep Learning | Session 1 | Playground </title>
+  <style>
+    :root{
+      --bg:#f5f7fa;
+      --panel:#ffffff;
+      --panel2:#fafbfc;
+      --text:#263238;
+      --muted:#78909c;
+      --accent:#ff6f00;
+      --good:#0097a7;
+      --bad:#f4511e;
+      --grid:#eceff1;
+      --border:#cfd8dc;
+    }
+    *{box-sizing:border-box}
+    body{
+      margin:0;
+      font-family: 'Roboto', ui-sans-serif, system-ui, -apple-system, Segoe UI, Helvetica, Arial;
+      background:var(--bg);
+      color:var(--text);
+      min-height:100vh;
+    }
+    header{
+      padding:20px 20px 12px;
+      max-width:1400px;
+      margin:0 auto;
+      background:var(--panel);
+      border-bottom:1px solid var(--border);
+    }
+    header h1{
+      margin:0 0 8px;
+      font-size:24px;
+      font-weight:400;
+      letter-spacing:.2px;
+      color:var(--text);
+    }
+    header p{
+      margin:0;
+      color:var(--muted);
+      font-size:14px;
+      line-height:1.4;
+      max-width:900px;
+    }
+    .tabs{
+      max-width:1400px;
+      margin:0 auto;
+      padding:0 20px;
+      display:flex;
+      gap:8px;
+      background:var(--panel);
+      border-bottom:1px solid var(--border);
+    }
+    .tabBtn{
+      border:none;
+      background:transparent;
+      color:var(--muted);
+      padding:12px 20px;
+      border-bottom:3px solid transparent;
+      cursor:pointer;
+      font-size:14px;
+      font-weight:500;
+      transition:all 0.2s;
+    }
+    .tabBtn:hover{
+      color:var(--text);
+      background:var(--panel2);
+    }
+    .tabBtn.active{
+      color:var(--accent);
+      border-bottom-color:var(--accent);
+    }
+    .wrap{
+      max-width:1400px;
+      margin:0 auto;
+      padding:20px;
+      display:grid;
+      grid-template-columns: 380px 1fr;
+      grid-template-areas:
+        "controls visuals"
+        "data data";
+      gap:20px;
+    }
+    .controlsCard{grid-area:controls;}
+    .dataCard{grid-area:data;}
+    .visualsCard{grid-area:visuals;}
+    .card{
+      background:var(--panel);
+      border:1px solid var(--border);
+      border-radius:8px;
+      padding:20px;
+      box-shadow: 0 2px 8px rgba(0,0,0,.04);
+    }
+    .card h2{
+      font-size:16px;
+      font-weight:500;
+      margin:0 0 16px;
+      color:var(--text);
+      letter-spacing:.2px;
+    }
+    .sectionCaption{
+      color:var(--muted);
+      font-size:13px;
+      margin-bottom:12px;
+    }
+    .row{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:10px;
+      margin:0 0 8px;
+    }
+    label{
+      font-size:13px;
+      color:var(--muted);
+      white-space:nowrap;
+      font-weight:500;
+    }
+    input[type="range"]{
+      width:100%;
+      height:4px;
+      -webkit-appearance:none;
+      appearance:none;
+      background:var(--grid);
+      border-radius:2px;
+      outline:none;
+    }
+    input[type="range"]::-webkit-slider-thumb{
+      -webkit-appearance:none;
+      appearance:none;
+      width:16px;
+      height:16px;
+      border-radius:50%;
+      background:var(--accent);
+      cursor:pointer;
+      box-shadow:0 2px 4px rgba(0,0,0,.2);
+    }
+    input[type="range"]::-moz-range-thumb{
+      width:16px;
+      height:16px;
+      border-radius:50%;
+      background:var(--accent);
+      cursor:pointer;
+      border:none;
+      box-shadow:0 2px 4px rgba(0,0,0,.2);
+    }
+    .val{
+      min-width:60px;
+      text-align:center;
+      font-variant-numeric: tabular-nums;
+      color:var(--text);
+      font-size:13px;
+      font-weight:500;
+    }
+    .pill{
+      display:inline-flex;
+      gap:6px;
+      align-items:center;
+      padding:6px 12px;
+      border-radius:4px;
+      border:1px solid var(--border);
+      background:var(--panel2);
+      color:var(--text);
+      font-size:12px;
+      font-weight:500;
+    }
+    .pills{display:flex; flex-wrap:wrap; gap:8px; margin-top:12px}
+    .metric{
+      border:1px solid var(--border);
+      border-radius:6px;
+      padding:12px 16px;
+      background:var(--panel2);
+      text-align:center;
+      display:flex;
+      flex-direction:column;
+      justify-content:center;
+    }
+    .metric .k{color:var(--muted); font-size:12px; font-weight:500; text-transform:uppercase; letter-spacing:.5px;}
+    .metric .v{
+      font-size:24px;
+      margin-top:6px;
+      font-variant-numeric: tabular-nums;
+      font-weight:400;
+      color:var(--text);
+    }
+    .metricsBar{
+      max-width:1400px;
+      margin:0 auto;
+      display:flex;
+      justify-content:center;
+      gap:16px;
+      flex-wrap:wrap;
+      padding:20px;
+    }
+    .metricsBar .metric{
+      min-width:140px;
+    }
+    .confusion{
+      display:grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap:8px;
+      margin-top:10px;
+    }
+    .confCell{
+      border:1px solid var(--border);
+      border-radius:6px;
+      padding:10px;
+      background:var(--panel2);
+      text-align:center;
+      font-variant-numeric: tabular-nums;
+    }
+    .confLabel{color:var(--muted); font-size:11px; display:block; margin-bottom:4px; font-weight:500;}
+    .toggles{
+      display:flex;
+      gap:10px;
+      align-items:center;
+      flex-wrap:wrap;
+      margin-top:12px;
+    }
+    .controlsGrid{
+      display:grid;
+      grid-template-columns:repeat(2,1fr);
+      gap:12px 16px;
+      margin-top:8px;
+    }
+    .controlItem input{width:100%;}
+    .controlGroup{margin-top:16px; padding-top:16px; border-top:1px solid var(--border);}
+    .controlsCompact{gap:10px;}
+    .threeCols{grid-template-columns:repeat(3,minmax(0,1fr));}
+    select, button{
+      background:var(--panel2);
+      color:var(--text);
+      border:1px solid var(--border);
+      border-radius:4px;
+      padding:8px 12px;
+      font-size:13px;
+      font-weight:500;
+      cursor:pointer;
+      transition:all 0.15s;
+    }
+    button:hover{
+      background:var(--panel);
+      border-color:var(--accent);
+    }
+    .canvasGrid{
+      display:grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap:20px;
+    }
+    canvas{
+      width:100%;
+      height:auto;
+      border-radius:6px;
+      border:1px solid var(--border);
+      background:#fafbfc;
+    }
+    .legend{
+      display:flex;
+      justify-content:space-between;
+      font-size:12px;
+      color:var(--muted);
+      margin-top:8px;
+      font-weight:500;
+    }
+    table{
+      width:100%;
+      border-collapse:separate;
+      border-spacing:0;
+      font-size:13px;
+      overflow:hidden;
+      border-radius:6px;
+      border:1px solid var(--border);
+    }
+    thead th{
+      position:sticky;
+      top:0;
+      background:var(--panel2);
+      color:var(--muted);
+      text-align:left;
+      padding:10px 10px;
+      border-bottom:1px solid var(--border);
+      font-weight:600;
+      font-size:12px;
+      text-transform:uppercase;
+      letter-spacing:.3px;
+    }
+    tbody td{
+      padding:8px 10px;
+      border-bottom:1px solid var(--grid);
+      font-variant-numeric: tabular-nums;
+    }
+    tbody tr:hover{background:var(--panel2);}
+    tbody tr:last-child td{border-bottom:none}
+    /* Highlight raw data columns (x₁, x₂, y) */
+    thead th:nth-child(-n+3){
+      background:rgba(59, 130, 246, 0.1);
+      border-right:2px solid rgba(59, 130, 246, 0.3);
+    }
+    tbody td:nth-child(-n+3){
+      background:rgba(59, 130, 246, 0.05);
+      border-right:2px solid rgba(59, 130, 246, 0.2);
+    }
+    tbody tr:hover td:nth-child(-n+3){
+      background:rgba(59, 130, 246, 0.12);
+    }
+
+    /* Highlight probability columns (score, probability, loss) */
+    thead th:nth-child(4), thead th:nth-child(5), thead th:nth-child(6){
+      background:rgba(147, 51, 234, 0.1);
+    }
+    tbody td:nth-child(4), tbody td:nth-child(5), tbody td:nth-child(6){
+      background:rgba(147, 51, 234, 0.05);
+    }
+    tbody tr:hover td:nth-child(4), tbody tr:hover td:nth-child(5), tbody tr:hover td:nth-child(6){
+      background:rgba(147, 51, 234, 0.12);
+    }
+
+    /* Highlight prediction columns (prediction, ✓) */
+    thead th:nth-child(7), thead th:nth-child(8){
+      background:rgba(16, 185, 129, 0.1);
+    }
+    tbody td:nth-child(7), tbody td:nth-child(8){
+      background:rgba(16, 185, 129, 0.05);
+    }
+    tbody tr:hover td:nth-child(7), tbody tr:hover td:nth-child(8){
+      background:rgba(16, 185, 129, 0.12);
+    }
+    /* Add border after probability columns */
+    thead th:nth-child(6){
+      border-right:2px solid rgba(147, 51, 234, 0.3);
+    }
+    tbody td:nth-child(6){
+      border-right:2px solid rgba(147, 51, 234, 0.2);
+    }
+    .y0{color:var(--bad); font-weight:600;}
+    .y1{color:var(--good); font-weight:600;}
+    .smallNote{
+      color:var(--muted);
+      font-size:12px;
+      margin-top:12px;
+      line-height:1.4;
+      padding:8px 12px;
+      background:var(--panel2);
+      border-radius:4px;
+      border-left:3px solid var(--accent);
+    }
+    .footer{
+      max-width:1400px;
+      margin:20px auto;
+      padding:0 20px 20px;
+      color:var(--muted);
+      font-size:12px;
+      text-align:center;
+    }
+    .kbd{
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+      padding:2px 6px;
+      border:1px solid var(--border);
+      border-radius:3px;
+      background:var(--panel2);
+      color:var(--text);
+      font-size:12px;
+    }
+    .tooltip{
+      position:fixed;
+      padding:10px 12px;
+      border-radius:6px;
+      background:#263238;
+      color:#ffffff;
+      box-shadow:0 4px 12px rgba(0,0,0,.25);
+      font-size:12px;
+      pointer-events:none;
+      z-index:100;
+      opacity:0;
+      transform:translateY(-4px);
+      transition: opacity .1s ease, transform .1s ease;
+      min-width:180px;
+    }
+    .tooltip .muted{color:#b0bec5}
+    .tooltip.visible{
+      opacity:1;
+      transform:translateY(0);
+    }
+    .tabPanel{display:none;}
+    .tabPanel.active{display:block;}
+    .groupLabel{
+      font-size:13px;
+      color:var(--muted);
+      margin-top:16px;
+      margin-bottom:8px;
+      font-weight:600;
+      text-transform:uppercase;
+      letter-spacing:.5px;
+    }
+
+    /* Training controls */
+    .trainingSection{
+      margin-top:16px;
+      padding-top:16px;
+      border-top:1px solid var(--border);
+    }
+    .trainingToggle{
+      display:flex;
+      align-items:center;
+      gap:8px;
+      cursor:pointer;
+      padding:8px;
+      margin:-8px;
+      border-radius:4px;
+      transition:background 0.15s;
+    }
+    .trainingToggle:hover{
+      background:var(--panel2);
+    }
+    .trainingToggle input[type="checkbox"]{
+      width:auto;
+    }
+    .trainingControls{
+      margin-top:12px;
+      display:none;
+    }
+    .trainingControls.active{
+      display:block;
+    }
+    .lossChart{
+      width:100%;
+      height:120px;
+      margin-top:12px;
+      border:1px solid var(--border);
+      border-radius:4px;
+      background:var(--panel2);
+    }
+    .trainingButtons{
+      display:flex;
+      gap:8px;
+      margin-top:12px;
+    }
+    .trainingButtons button{
+      flex:1;
+    }
+    button.primary{
+      background:var(--accent);
+      color:white;
+      border-color:var(--accent);
+    }
+    button.primary:hover{
+      background:#e65100;
+      border-color:#e65100;
+    }
+    .dataWithScatter{
+      display:grid;
+      grid-template-rows: auto 1fr;
+      gap:16px;
+    }
+    @media (max-width:720px){
+      .controlsGrid{grid-template-columns:1fr;}
+      .threeCols{grid-template-columns:1fr;}
+    }
+    @media (max-width:980px){
+      .threeCols{grid-template-columns:repeat(2,minmax(0,1fr));}
+    }
+    @media (max-width:1200px){
+      .wrap{
+        grid-template-columns:1fr;
+        grid-template-areas:
+          "controls"
+          "data"
+          "visuals";
+      }
+      .canvasGrid{grid-template-columns:1fr;}
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1> Hands-On Deep Learning | Session 1 | Playground </h1>
+    <p>
+      This is meant to be an interactive environment to explore and get intuition on deep learning concepts.
+    </p>
+  </header>
+
+  <div class="tabs">
+    <button class="tabBtn active" data-tab="tab-data">Data</button>
+    <button class="tabBtn" data-tab="tab-logistic">Logistic Regression</button>
+    <button class="tabBtn" data-tab="tab-nn">Neural Network</button>
+  </div>
+
+  <div id="tab-data" class="tabPanel active">
+    <div class="wrap" style="grid-template-columns: 380px 1fr; grid-template-areas: 'controls visualization';">
+      <!-- Dataset Controls -->
+      <section class="card controlsCard">
+        <h2>Dataset Selection</h2>
+        <div class="sectionCaption">Choose a dataset to explore</div>
+
+        <div class="row">
+          <label for="datasetSelectMain">Dataset</label>
+          <select id="datasetSelectMain">
+            <option value="linear">Linear Separation</option>
+            <option value="xor">XOR Pattern</option>
+            <option value="circular">Circular Separation</option>
+          </select>
+        </div>
+
+        <div class="datasetInfo" id="datasetInfo">
+          <div class="groupLabel">Dataset Statistics</div>
+          <div class="metric">
+            <div class="k">Total Points</div>
+            <div class="v" id="totalPoints">—</div>
+          </div>
+          <div class="metric" style="margin-top:12px">
+            <div class="k">Class 0</div>
+            <div class="v" id="class0Count" style="color:var(--bad)">—</div>
+          </div>
+          <div class="metric" style="margin-top:12px">
+            <div class="k">Class 1</div>
+            <div class="v" id="class1Count" style="color:var(--good)">—</div>
+          </div>
+        </div>
+
+      </section>
+
+      <!-- Data Visualization -->
+      <section class="card" style="grid-area: visualization;">
+        <h2>Data Exploration</h2>
+        <canvas id="dataViz" width="700" height="500"></canvas>
+        <div class="legend">
+          <span>Scatter plot</span>
+          <span><span style="color:var(--good)">●</span> Class 1 · <span style="color:var(--bad)">●</span> Class 0</span>
+        </div>
+      </section>
+    </div>
+  </div>
+
+  <div id="tab-logistic" class="tabPanel">
+    <div style="max-width:1400px; margin:0 auto; padding:20px;">
+      <!-- Two Column Layout with Aligned Rows -->
+      <div style="display:grid; grid-template-columns: 1fr 1fr; gap:20px; grid-template-areas: 'pred-metrics dec-metrics' 'pred-controls dec-controls' 'pred-viz dec-viz' 'data data';">
+
+        <!-- ROW 1 LEFT: Probability Metrics -->
+        <div style="grid-area:pred-metrics; display:flex;">
+          <div style="background:rgba(147, 51, 234, 0.05); border:2px solid rgba(147, 51, 234, 0.2); border-radius:8px; padding:16px; display:flex; flex-direction:column; width:100%;">
+            <h2 style="text-align:center; margin:0 0 12px; color:var(--text); font-size:18px; font-weight:500;">Model Probability</h2>
+            <div style="display:flex; justify-content:center; align-items:center; gap:16px; flex:1;">
+              <div class="metric">
+                <div class="k">Loss</div>
+                <div class="v" id="lossOut">—</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ROW 1 RIGHT: Prediction Metrics -->
+        <div style="grid-area:dec-metrics; display:flex;">
+          <div style="background:rgba(16, 185, 129, 0.05); border:2px solid rgba(16, 185, 129, 0.2); border-radius:8px; padding:16px; display:flex; flex-direction:column; width:100%;">
+            <h2 style="text-align:center; margin:0 0 12px; color:var(--text); font-size:18px; font-weight:500;">Model Prediction</h2>
+            <div style="display:flex; justify-content:center; align-items:center; gap:16px; flex-wrap:wrap; flex:1;">
+              <div class="metric">
+                <div class="k">Accuracy</div>
+                <div class="v" id="accOut">—</div>
+              </div>
+              <div class="confusion" aria-label="Confusion matrix">
+                <div class="confCell"><span class="confLabel">True Negative</span><span id="confTN">—</span></div>
+                <div class="confCell"><span class="confLabel">False Positive</span><span id="confFP">—</span></div>
+                <div class="confCell"><span class="confLabel">False Negative</span><span id="confFN">—</span></div>
+                <div class="confCell"><span class="confLabel">True Positive</span><span id="confTP">—</span></div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ROW 2 LEFT: Prediction Controls -->
+        <div style="grid-area:pred-controls;">
+          <section class="card" style="background:rgba(147, 51, 234, 0.05); border:2px solid rgba(147, 51, 234, 0.2); height:100%;">
+            <div style="padding:12px;">
+              <div class="controlsGrid controlsCompact">
+                <div class="controlItem">
+                  <div class="row">
+                    <label for="bias">b</label>
+                    <div class="val" id="biasVal"></div>
+                  </div>
+                  <input id="bias" type="range" min="-3" max="3" step="0.01" value="0.4" />
+                </div>
+                <div class="controlItem">
+                  <div class="row">
+                    <label for="wGPA">w₁</label>
+                    <div class="val" id="wGPAVal"></div>
+                  </div>
+                  <input id="wGPA" type="range" min="-3" max="3" step="0.01" value="0.2" />
+                </div>
+                <div class="controlItem">
+                  <div class="row">
+                    <label for="wExp">w₂</label>
+                    <div class="val" id="wExpVal"></div>
+                  </div>
+                  <input id="wExp" type="range" min="-3" max="3" step="0.01" value="0.5" />
+                </div>
+              </div>
+
+              <div class="toggles">
+                <button id="resetBtn" title="Reset to default weights">Reset</button>
+              </div>
+
+              <!-- Training Section -->
+              <div class="trainingSection">
+                <label class="trainingToggle">
+                  <input type="checkbox" id="showTraining">
+                  <span style="font-weight:500; color:var(--text)">Show Training Controls</span>
+                </label>
+                <div class="trainingControls" id="trainingControls">
+                  <div class="controlItem">
+                    <div class="row">
+                      <label for="learningRate">Learning Rate</label>
+                      <div class="val" id="learningRateVal"></div>
+                    </div>
+                    <input id="learningRate" type="range" min="0.01" max="1" step="0.01" value="0.1" />
+                  </div>
+                  <div class="controlItem">
+                    <div class="row">
+                      <label for="iterations">Iterations</label>
+                      <div class="val" id="iterationsVal"></div>
+                    </div>
+                    <input id="iterations" type="range" min="10" max="500" step="10" value="100" />
+                  </div>
+                  <div class="trainingButtons">
+                    <button id="stepBtn">Step</button>
+                    <button id="trainBtn" class="primary">Train</button>
+                  </div>
+                  <canvas id="lossChart" class="lossChart" width="660" height="240"></canvas>
+                  <div class="smallNote">
+                    Training uses gradient descent to minimize binary cross-entropy loss. Watch the loss decrease as the model learns.
+                  </div>
+                </div>
+              </div>
+            </div>
+          </section>
+        </div>
+
+        <!-- ROW 2 RIGHT: Decision Controls -->
+        <div style="grid-area:dec-controls;">
+          <section class="card" style="background:rgba(16, 185, 129, 0.05); border:2px solid rgba(16, 185, 129, 0.2); height:100%;">
+            <div style="padding:12px;">
+              <div class="controlsGrid controlsCompact">
+                <div class="controlItem">
+                  <div class="row">
+                    <label for="thr">Threshold</label>
+                    <div class="val" id="thrVal"></div>
+                  </div>
+                  <input id="thr" type="range" min="0.05" max="0.95" step="0.01" value="0.50" />
+                </div>
+              </div>
+            </div>
+          </section>
+        </div>
+
+        <!-- ROW 3 LEFT: Probability Heatmap -->
+        <div style="grid-area:pred-viz;">
+          <section class="card" style="background:rgba(147, 51, 234, 0.05); border:2px solid rgba(147, 51, 234, 0.2);">
+            <h2 style="padding:16px 16px 0;">Probability Heatmap</h2>
+            <div style="padding:16px;">
+              <canvas id="heat" width="560" height="380"></canvas>
+              <div class="legend">
+                <span>Probability p(x)</span>
+                <span id="heatLegendRight">Low → High</span>
+              </div>
+            </div>
+          </section>
+        </div>
+
+        <!-- ROW 3 RIGHT: Prediction Regions -->
+        <div style="grid-area:dec-viz;">
+          <section class="card" style="background:rgba(16, 185, 129, 0.05); border:2px solid rgba(16, 185, 129, 0.2);">
+            <h2 style="padding:16px 16px 0;">Prediction Regions</h2>
+            <div style="padding:16px;">
+              <canvas id="decision" width="560" height="380"></canvas>
+              <div class="legend">
+                <span>Classification</span>
+                <span><span style="color:var(--good)">■</span> Predict 1 · <span style="color:var(--bad)">■</span> Predict 0</span>
+              </div>
+            </div>
+          </section>
+        </div>
+
+        <!-- ROW 4: DATA TABLE (Full Width) -->
+        <section class="card dataCard" style="grid-area:data;">
+          <h2>Data Table</h2>
+          <div style="max-height:500px; overflow:auto; border-radius:6px;">
+            <table>
+              <thead>
+                <tr>
+                  <th>x₁</th>
+                  <th>x₂</th>
+                  <th>y</th>
+                  <th>score</th>
+                  <th>probability</th>
+                  <th>loss</th>
+                  <th>prediction</th>
+                  <th>✓</th>
+                </tr>
+              </thead>
+              <tbody id="tbody"></tbody>
+            </table>
+          </div>
+        </section>
+
+      </div>
+    </div>
+  </div>
+
+  <div id="tab-nn" class="tabPanel">
+    <div style="max-width:1400px; margin:0 auto; padding:20px;">
+      <!-- Two Column Layout with Aligned Rows -->
+      <div style="display:grid; grid-template-columns: 1fr 1fr; gap:20px; grid-template-areas: 'pred-metrics dec-metrics' 'pred-controls dec-controls' 'pred-viz dec-viz' 'data data';">
+
+        <!-- ROW 1 LEFT: Probability Metrics -->
+        <div style="grid-area:pred-metrics; display:flex;">
+          <div style="background:rgba(147, 51, 234, 0.05); border:2px solid rgba(147, 51, 234, 0.2); border-radius:8px; padding:16px; display:flex; flex-direction:column; width:100%;">
+            <h2 style="text-align:center; margin:0 0 12px; color:var(--text); font-size:18px; font-weight:500;">Model Probability</h2>
+            <div style="display:flex; justify-content:center; align-items:center; gap:16px; flex:1;">
+              <div class="metric">
+                <div class="k">Loss</div>
+                <div class="v" id="nnLossOut">—</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ROW 1 RIGHT: Prediction Metrics -->
+        <div style="grid-area:dec-metrics; display:flex;">
+          <div style="background:rgba(16, 185, 129, 0.05); border:2px solid rgba(16, 185, 129, 0.2); border-radius:8px; padding:16px; display:flex; flex-direction:column; width:100%;">
+            <h2 style="text-align:center; margin:0 0 12px; color:var(--text); font-size:18px; font-weight:500;">Model Prediction</h2>
+            <div style="display:flex; justify-content:center; align-items:center; gap:16px; flex-wrap:wrap; flex:1;">
+              <div class="metric">
+                <div class="k">Accuracy</div>
+                <div class="v" id="nnAccOut">—</div>
+              </div>
+              <div class="confusion" aria-label="Confusion matrix (NN)">
+                <div class="confCell"><span class="confLabel">True Negative</span><span id="nnConfTN">—</span></div>
+                <div class="confCell"><span class="confLabel">False Positive</span><span id="nnConfFP">—</span></div>
+                <div class="confCell"><span class="confLabel">False Negative</span><span id="nnConfFN">—</span></div>
+                <div class="confCell"><span class="confLabel">True Positive</span><span id="nnConfTP">—</span></div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ROW 2 LEFT: Prediction Controls -->
+        <div style="grid-area:pred-controls;">
+          <section class="card" style="background:rgba(147, 51, 234, 0.05); border:2px solid rgba(147, 51, 234, 0.2); height:100%;">
+            <div style="padding:8px;">
+              <!-- All controls in 4-column grid, no labels -->
+              <div style="display:grid; grid-template-columns: repeat(4, 1fr); gap:8px;">
+                <div class="controlItem">
+                  <div class="row">
+                    <div class="val" id="nnH1BiasVal"></div>
+                  </div>
+                  <input id="nnH1Bias" type="range" min="-4" max="4" step="0.01" value="0.5" />
+                </div>
+                <div class="controlItem">
+                  <div class="row">
+                    <div class="val" id="nnH1W1Val"></div>
+                  </div>
+                  <input id="nnH1W1" type="range" min="-4" max="4" step="0.01" value="1.0" />
+                </div>
+                <div class="controlItem">
+                  <div class="row">
+                    <div class="val" id="nnH1W2Val"></div>
+                  </div>
+                  <input id="nnH1W2" type="range" min="-4" max="4" step="0.01" value="1.0" />
+                </div>
+                <div class="controlItem">
+                  <div class="row">
+                    <div class="val" id="nnH2BiasVal"></div>
+                  </div>
+                  <input id="nnH2Bias" type="range" min="-4" max="4" step="0.01" value="-0.5" />
+                </div>
+                <div class="controlItem">
+                  <div class="row">
+                    <div class="val" id="nnH2W1Val"></div>
+                  </div>
+                  <input id="nnH2W1" type="range" min="-4" max="4" step="0.01" value="-1.0" />
+                </div>
+                <div class="controlItem">
+                  <div class="row">
+                    <div class="val" id="nnH2W2Val"></div>
+                  </div>
+                  <input id="nnH2W2" type="range" min="-4" max="4" step="0.01" value="1.0" />
+                </div>
+                <div class="controlItem">
+                  <div class="row">
+                    <div class="val" id="nnH3BiasVal"></div>
+                  </div>
+                  <input id="nnH3Bias" type="range" min="-4" max="4" step="0.01" value="0.0" />
+                </div>
+                <div class="controlItem">
+                  <div class="row">
+                    <div class="val" id="nnH3W1Val"></div>
+                  </div>
+                  <input id="nnH3W1" type="range" min="-4" max="4" step="0.01" value="0.5" />
+                </div>
+                <div class="controlItem">
+                  <div class="row">
+                    <div class="val" id="nnH3W2Val"></div>
+                  </div>
+                  <input id="nnH3W2" type="range" min="-4" max="4" step="0.01" value="-0.5" />
+                </div>
+                <div class="controlItem">
+                  <div class="row">
+                    <div class="val" id="nnOutBiasVal"></div>
+                  </div>
+                  <input id="nnOutBias" type="range" min="-4" max="4" step="0.01" value="0.0" />
+                </div>
+                <div class="controlItem">
+                  <div class="row">
+                    <div class="val" id="nnOutH1Val"></div>
+                  </div>
+                  <input id="nnOutH1" type="range" min="-4" max="4" step="0.01" value="1.0" />
+                </div>
+                <div class="controlItem">
+                  <div class="row">
+                    <div class="val" id="nnOutH2Val"></div>
+                  </div>
+                  <input id="nnOutH2" type="range" min="-4" max="4" step="0.01" value="1.0" />
+                </div>
+                <div class="controlItem">
+                  <div class="row">
+                    <div class="val" id="nnOutH3Val"></div>
+                  </div>
+                  <input id="nnOutH3" type="range" min="-4" max="4" step="0.01" value="1.0" />
+                </div>
+              </div>
+
+        <div class="toggles">
+          <button id="nnResetBtn" title="Reset NN weights">Reset</button>
+        </div>
+
+        <!-- Training Section for NN -->
+        <div class="trainingSection">
+          <label class="trainingToggle">
+            <input type="checkbox" id="nnShowTraining">
+            <span style="font-weight:500; color:var(--text)">Show Training Controls</span>
+          </label>
+          <div class="trainingControls" id="nnTrainingControls">
+            <div class="controlItem">
+              <div class="row">
+                <label for="nnLearningRate">Learning Rate</label>
+                <div class="val" id="nnLearningRateVal"></div>
+              </div>
+              <input id="nnLearningRate" type="range" min="0.01" max="1" step="0.01" value="0.1" />
+            </div>
+            <div class="controlItem">
+              <div class="row">
+                <label for="nnIterations">Iterations</label>
+                <div class="val" id="nnIterationsVal"></div>
+              </div>
+              <input id="nnIterations" type="range" min="10" max="500" step="10" value="100" />
+            </div>
+            <div class="trainingButtons">
+              <button id="nnStepBtn">Step</button>
+              <button id="nnTrainBtn" class="primary">Train</button>
+            </div>
+            <canvas id="nnLossChart" class="lossChart" width="660" height="240"></canvas>
+            <div class="smallNote">
+              Neural network training with backpropagation. The network can learn non-linear decision boundaries.
+            </div>
+          </div>
+              </div>
+            </div>
+          </section>
+        </div>
+
+        <!-- ROW 2 RIGHT: Decision Controls -->
+        <div style="grid-area:dec-controls;">
+          <section class="card" style="background:rgba(16, 185, 129, 0.05); border:2px solid rgba(16, 185, 129, 0.2); height:100%;">
+            <div style="padding:12px;">
+              <div class="controlsGrid controlsCompact">
+                <div class="controlItem">
+                  <div class="row">
+                    <label for="nnThr">Threshold</label>
+                    <div class="val" id="nnThrVal"></div>
+                  </div>
+                  <input id="nnThr" type="range" min="0.05" max="0.95" step="0.01" value="0.50" />
+                </div>
+              </div>
+            </div>
+          </section>
+        </div>
+
+        <!-- ROW 3 LEFT: Probability Heatmap -->
+        <div style="grid-area:pred-viz;">
+          <section class="card" style="background:rgba(147, 51, 234, 0.05); border:2px solid rgba(147, 51, 234, 0.2);">
+            <h2 style="padding:16px 16px 0;">Probability Heatmap</h2>
+            <div style="padding:16px;">
+              <canvas id="nnHeat" width="560" height="380"></canvas>
+              <div class="legend">
+                <span>Probability p(x)</span>
+                <span id="nnHeatLegendRight">Low → High</span>
+              </div>
+            </div>
+          </section>
+        </div>
+
+        <!-- ROW 3 RIGHT: Prediction Regions -->
+        <div style="grid-area:dec-viz;">
+          <section class="card" style="background:rgba(16, 185, 129, 0.05); border:2px solid rgba(16, 185, 129, 0.2);">
+            <h2 style="padding:16px 16px 0;">Prediction Regions</h2>
+            <div style="padding:16px;">
+              <canvas id="nnDecision" width="560" height="380"></canvas>
+              <div class="legend">
+                <span>Classification</span>
+                <span><span style="color:var(--good)">■</span> Predict 1 · <span style="color:var(--bad)">■</span> Predict 0</span>
+              </div>
+            </div>
+          </section>
+        </div>
+
+        <!-- ROW 4: DATA TABLE (Full Width) -->
+        <section class="card dataCard" style="grid-area:data;">
+          <h2>Data Table</h2>
+          <div style="max-height:500px; overflow:auto; border-radius:6px;">
+            <table>
+              <thead>
+                <tr>
+                  <th>x₁</th>
+                  <th>x₂</th>
+                  <th>y</th>
+                  <th>score</th>
+                  <th>probability</th>
+                  <th>loss</th>
+                  <th>prediction</th>
+                  <th>✓</th>
+                </tr>
+              </thead>
+              <tbody id="nnTbody"></tbody>
+            </table>
+          </div>
+        </section>
+
+      </div>
+    </div>
+  </div>
+
+  <div id="tooltip" class="tooltip" aria-hidden="true"></div>
+
+  <div class="footer">
+    Copyright &copy; 2026 Antoine Désir. Inspired by <a href="https://playground.tensorflow.org/" target="_blank" rel="noopener">TensorFlow Playground</a>.
+  </div>
+
+<script>
+/** -----------------------------
+ *  1) Datasets
+ *  ----------------------------- */
+// Seeded random number generator for reproducible datasets
+let seedValue = 42;
+function seededRandom() {
+  seedValue = (seedValue * 9301 + 49297) % 233280;
+  return seedValue / 233280;
+}
+
+// Helper to generate datasets with noise
+function generateLinearDataset(n = 200) {
+  const rows = [];
+  const noise = 0.6;
+  for (let i = 0; i < n; i++) {
+    const x = 1.5 + seededRandom() * 2.5 + (seededRandom() - 0.5) * noise;
+    const y = 1.5 + seededRandom() * 2.5 + (seededRandom() - 0.5) * noise;
+    rows.push({x, y, label: 0});
+  }
+  for (let i = 0; i < n; i++) {
+    const x = 5.5 + seededRandom() * 2.5 + (seededRandom() - 0.5) * noise;
+    const y = 5.0 + seededRandom() * 2.5 + (seededRandom() - 0.5) * noise;
+    rows.push({x, y, label: 1});
+  }
+  return rows;
+}
+
+function generateXORDataset(n = 200) {
+  const rows = [];
+  const noise = 0.5;
+  const perQuad = n / 2;
+  // Class 1 - bottom left and top right
+  for (let i = 0; i < perQuad; i++) {
+    const x = 1.2 + seededRandom() * 2.0 + (seededRandom() - 0.5) * noise;
+    const y = 1.5 + seededRandom() * 2.0 + (seededRandom() - 0.5) * noise;
+    rows.push({x, y, label: 1});
+  }
+  for (let i = 0; i < perQuad; i++) {
+    const x = 5.5 + seededRandom() * 2.5 + (seededRandom() - 0.5) * noise;
+    const y = 5.5 + seededRandom() * 2.5 + (seededRandom() - 0.5) * noise;
+    rows.push({x, y, label: 1});
+  }
+  // Class 0 - bottom right and top left
+  for (let i = 0; i < perQuad; i++) {
+    const x = 5.5 + seededRandom() * 2.5 + (seededRandom() - 0.5) * noise;
+    const y = 1.5 + seededRandom() * 2.0 + (seededRandom() - 0.5) * noise;
+    rows.push({x, y, label: 0});
+  }
+  for (let i = 0; i < perQuad; i++) {
+    const x = 1.2 + seededRandom() * 2.0 + (seededRandom() - 0.5) * noise;
+    const y = 5.5 + seededRandom() * 2.5 + (seededRandom() - 0.5) * noise;
+    rows.push({x, y, label: 0});
+  }
+  return rows;
+}
+
+function generateCircularDataset(n = 200) {
+  const rows = [];
+  const noise = 0.4;
+  const cx = 4.5, cy = 4.5;
+  // Class 1 - inner circle
+  for (let i = 0; i < n; i++) {
+    const angle = seededRandom() * 2 * Math.PI;
+    const r = 0.8 + seededRandom() * 1.2 + (seededRandom() - 0.5) * noise;
+    const x = cx + r * Math.cos(angle);
+    const y = cy + r * Math.sin(angle);
+    rows.push({x, y, label: 1});
+  }
+  // Class 0 - outer ring
+  for (let i = 0; i < n; i++) {
+    const angle = seededRandom() * 2 * Math.PI;
+    const r = 2.5 + seededRandom() * 1.0 + (seededRandom() - 0.5) * noise;
+    const x = cx + r * Math.cos(angle);
+    const y = cy + r * Math.sin(angle);
+    rows.push({x, y, label: 0});
+  }
+  return rows;
+}
+
+// Generate datasets with fixed seed for reproducibility
+function initializeDatasets() {
+  seedValue = 42; // Reset seed for linear dataset
+  const linearRows = generateLinearDataset(100);
+
+  seedValue = 42; // Reset seed for XOR dataset
+  const xorRows = generateXORDataset(100);
+
+  seedValue = 42; // Reset seed for circular dataset
+  const circularRows = generateCircularDataset(100);
+
+  return {
+    linear: {
+      name: "Linear Separation",
+      labels: {x:"Feature 1", y:"Feature 2"},
+      rows: linearRows,
+    },
+    xor: {
+      name: "XOR Pattern",
+      labels: {x:"Feature 1", y:"Feature 2"},
+      rows: xorRows,
+    },
+    circular: {
+      name: "Circular Separation",
+      labels: {x:"Feature 1", y:"Feature 2"},
+      rows: circularRows,
+    },
+  };
+}
+
+const dataSets = initializeDatasets();
+
+let currentDataset = "linear";
+let data = [];
+let axisLabels = dataSets[currentDataset].labels;
+let lossHistory = [];
+let nnLossHistory = [];
+
+function setDataset(key){
+  currentDataset = key;
+  const d = dataSets[key];
+  axisLabels = d.labels;
+  data = d.rows.map(r=>({gpa:r.x, exp:r.y, y:r.label}));
+  lossHistory = [];
+  nnLossHistory = [];
+}
+
+/** -----------------------------
+ *  2) Helpers
+ *  ----------------------------- */
+const clamp = (x,a,b)=>Math.max(a,Math.min(b,x));
+const sigmoid = (z)=> 1/(1+Math.exp(-z));
+function logLoss(y,p){
+  const eps = 1e-12;
+  const pp = clamp(p, eps, 1-eps);
+  return -(y*Math.log(pp) + (1-y)*Math.log(1-pp));
+}
+
+/** -----------------------------
+ *  3) State + UI bindings
+ *  ----------------------------- */
+const els = {
+  bias: document.getElementById("bias"),
+  wGPA: document.getElementById("wGPA"),
+  wExp: document.getElementById("wExp"),
+  thr: document.getElementById("thr"),
+  biasVal: document.getElementById("biasVal"),
+  wGPAVal: document.getElementById("wGPAVal"),
+  wExpVal: document.getElementById("wExpVal"),
+  thrVal: document.getElementById("thrVal"),
+  accOut: document.getElementById("accOut"),
+  lossOut: document.getElementById("lossOut"),
+  tbody: document.getElementById("tbody"),
+  heat: document.getElementById("heat"),
+  heatLegendRight: document.getElementById("heatLegendRight"),
+  resetBtn: document.getElementById("resetBtn"),
+  decision: document.getElementById("decision"),
+  tooltip: document.getElementById("tooltip"),
+  confTN: document.getElementById("confTN"),
+  confFP: document.getElementById("confFP"),
+  confFN: document.getElementById("confFN"),
+  confTP: document.getElementById("confTP"),
+  showTraining: document.getElementById("showTraining"),
+  trainingControls: document.getElementById("trainingControls"),
+  learningRate: document.getElementById("learningRate"),
+  learningRateVal: document.getElementById("learningRateVal"),
+  iterations: document.getElementById("iterations"),
+  iterationsVal: document.getElementById("iterationsVal"),
+  stepBtn: document.getElementById("stepBtn"),
+  trainBtn: document.getElementById("trainBtn"),
+  lossChart: document.getElementById("lossChart"),
+};
+
+const nnEls = {
+  h1Bias: document.getElementById("nnH1Bias"),
+  h1W1: document.getElementById("nnH1W1"),
+  h1W2: document.getElementById("nnH1W2"),
+  h2Bias: document.getElementById("nnH2Bias"),
+  h2W1: document.getElementById("nnH2W1"),
+  h2W2: document.getElementById("nnH2W2"),
+  h3Bias: document.getElementById("nnH3Bias"),
+  h3W1: document.getElementById("nnH3W1"),
+  h3W2: document.getElementById("nnH3W2"),
+  outBias: document.getElementById("nnOutBias"),
+  outH1: document.getElementById("nnOutH1"),
+  outH2: document.getElementById("nnOutH2"),
+  outH3: document.getElementById("nnOutH3"),
+  thr: document.getElementById("nnThr"),
+  h1BiasVal: document.getElementById("nnH1BiasVal"),
+  h1W1Val: document.getElementById("nnH1W1Val"),
+  h1W2Val: document.getElementById("nnH1W2Val"),
+  h2BiasVal: document.getElementById("nnH2BiasVal"),
+  h2W1Val: document.getElementById("nnH2W1Val"),
+  h2W2Val: document.getElementById("nnH2W2Val"),
+  h3BiasVal: document.getElementById("nnH3BiasVal"),
+  h3W1Val: document.getElementById("nnH3W1Val"),
+  h3W2Val: document.getElementById("nnH3W2Val"),
+  outBiasVal: document.getElementById("nnOutBiasVal"),
+  outH1Val: document.getElementById("nnOutH1Val"),
+  outH2Val: document.getElementById("nnOutH2Val"),
+  outH3Val: document.getElementById("nnOutH3Val"),
+  thrVal: document.getElementById("nnThrVal"),
+  accOut: document.getElementById("nnAccOut"),
+  lossOut: document.getElementById("nnLossOut"),
+  tbody: document.getElementById("nnTbody"),
+  heat: document.getElementById("nnHeat"),
+  heatLegendRight: document.getElementById("nnHeatLegendRight"),
+  resetBtn: document.getElementById("nnResetBtn"),
+  decision: document.getElementById("nnDecision"),
+  confTN: document.getElementById("nnConfTN"),
+  confFP: document.getElementById("nnConfFP"),
+  confFN: document.getElementById("nnConfFN"),
+  confTP: document.getElementById("nnConfTP"),
+  showTraining: document.getElementById("nnShowTraining"),
+  trainingControls: document.getElementById("nnTrainingControls"),
+  learningRate: document.getElementById("nnLearningRate"),
+  learningRateVal: document.getElementById("nnLearningRateVal"),
+  iterations: document.getElementById("nnIterations"),
+  iterationsVal: document.getElementById("nnIterationsVal"),
+  stepBtn: document.getElementById("nnStepBtn"),
+  trainBtn: document.getElementById("nnTrainBtn"),
+  lossChart: document.getElementById("nnLossChart"),
+};
+
+const defaults = { b:0.4, w1:0.2, w2:0.5, t:0.5 };
+const nnDefaults = {
+  h1Bias:0.5, h1W1:1.0, h1W2:1.0,
+  h2Bias:-0.5, h2W1:-1.0, h2W2:1.0,
+  h3Bias:0.0, h3W1:0.5, h3W2:-0.5,
+  outBias:0.0, outH1:1.0, outH2:1.0, outH3:1.0,
+  t:0.5,
+};
+setDataset(currentDataset);
+const hoverPoints = { dataViz: [], heat: [], decision: [], nnHeat: [], nnDecision: [] };
+const pad = {l:60, r:20, t:20, b:50};
+const zClamp = 6;
+
+function colorMap(u){
+  // TensorFlow Playground inspired: blue -> white -> orange
+  if(u < 0.5){
+    const t = u * 2;
+    const r = Math.round(220 + (255-220)*t);
+    const g = Math.round(230 + (255-230)*t);
+    const b = 255;
+    return [r, g, b, 255];
+  } else {
+    const t = (u - 0.5) * 2;
+    const r = 255;
+    const g = Math.round(255 - 144*t);
+    const b = Math.round(255 - 255*t);
+    return [r, g, b, 255];
+  }
+}
+
+function getParamsLog(){
+  return {
+    b: parseFloat(els.bias.value),
+    w1: parseFloat(els.wGPA.value),
+    w2: parseFloat(els.wExp.value),
+    t: parseFloat(els.thr.value),
+  };
+}
+
+function setParamsLog(p){
+  els.bias.value = p.b;
+  els.wGPA.value = p.w1;
+  els.wExp.value = p.w2;
+  els.thr.value  = p.t;
+}
+
+/** -----------------------------
+ *  4) Compute predictions
+ *  ----------------------------- */
+function computeAllLog(params){
+  const {b,w1,w2,t} = params;
+  const rows = data.map(r=>{
+    const z = b + w1*r.gpa + w2*r.exp;
+    const p = sigmoid(z);
+    const yhat = (p >= t) ? 1 : 0;
+    const loss = logLoss(r.y, p);
+    const correct = (yhat === r.y) ? 1 : 0;
+    return {...r, z, p, yhat, loss, correct};
+  });
+
+  const acc = rows.reduce((s,r)=>s+r.correct,0) / rows.length;
+  const avgLoss = rows.reduce((s,r)=>s+r.loss,0) / rows.length;
+  return {rows, acc, avgLoss};
+}
+
+function getPlotGeometry(rows, canvas){
+  const W = canvas.width, H = canvas.height;
+  const gpas = rows.map(d=>d.gpa);
+  const exps = rows.map(d=>d.exp);
+  const minX = Math.min(...gpas) - 0.5;
+  const maxX = Math.max(...gpas) + 0.5;
+  const minY = Math.min(...exps) - 0.5;
+  const maxY = Math.max(...exps) + 0.5;
+  const spanX = (maxX - minX) || 1;
+  const spanY = (maxY - minY) || 1;
+  const x2px = x => pad.l + (x - minX) * (W - pad.l - pad.r) / spanX;
+  const y2py = y => (H - pad.b) - (y - minY) * (H - pad.t - pad.b) / spanY;
+  return {W,H,pad,minX,maxX,minY,maxY,x2px,y2py};
+}
+
+/** -----------------------------
+ *  5) Render table + metrics
+ *  ----------------------------- */
+function renderTable(rows, tbodyEl){
+  tbodyEl.innerHTML = "";
+  for(const r of rows){
+    const tr = document.createElement("tr");
+    tr.innerHTML = `
+      <td>${r.gpa.toFixed(1)}</td>
+      <td>${r.exp.toFixed(1)}</td>
+      <td class="${r.y===1?'y1':'y0'}">${r.y}</td>
+      <td>${r.z.toFixed(3)}</td>
+      <td>${r.p.toFixed(3)}</td>
+      <td>${r.loss.toFixed(4)}</td>
+      <td class="${r.yhat===1?'y1':'y0'}">${r.yhat}</td>
+      <td>${r.correct ? '✓' : '✗'}</td>
+    `;
+    tbodyEl.appendChild(tr);
+  }
+}
+
+function renderMetrics(acc, avgLoss, accEl, lossEl){
+  accEl.textContent = (acc*100).toFixed(1) + "%";
+  lossEl.textContent = avgLoss.toFixed(3);
+}
+
+function computeConfusion(rows){
+  let tp=0, tn=0, fp=0, fn=0;
+  for(const r of rows){
+    if(r.y===1 && r.yhat===1) tp++;
+    else if(r.y===0 && r.yhat===0) tn++;
+    else if(r.y===0 && r.yhat===1) fp++;
+    else if(r.y===1 && r.yhat===0) fn++;
+  }
+  return {tp, tn, fp, fn};
+}
+
+function renderConfusion(counts, elTN, elFP, elFN, elTP){
+  elTN.textContent = counts.tn;
+  elFP.textContent = counts.fp;
+  elFN.textContent = counts.fn;
+  elTP.textContent = counts.tp;
+}
+
+/** -----------------------------
+ *  6) Modern scatter plot with hover effects
+ *  ----------------------------- */
+let hoveredPoint = null;
+
+function drawScatterData(rows, canvas, hoverKey){
+  const ctx = canvas.getContext("2d");
+  const {W,H,pad,minX,maxX,minY,maxY,x2px,y2py} = getPlotGeometry(rows, canvas);
+
+  ctx.clearRect(0,0,W,H);
+
+  // Modern gradient background
+  const gradient = ctx.createLinearGradient(0, 0, 0, H);
+  gradient.addColorStop(0, "#fafbfc");
+  gradient.addColorStop(1, "#f5f7fa");
+  ctx.fillStyle = gradient;
+  ctx.fillRect(0,0,W,H);
+
+  // Subtle grid with modern styling
+  ctx.strokeStyle = "rgba(207,216,220,0.4)";
+  ctx.lineWidth = 1;
+  for(let gx=Math.ceil(minX); gx<=Math.floor(maxX); gx++){
+    const x = x2px(gx);
+    ctx.beginPath(); ctx.moveTo(x,pad.t); ctx.lineTo(x,H-pad.b); ctx.stroke();
+  }
+  for(let gy=Math.ceil(minY); gy<=Math.floor(maxY); gy++){
+    const y = y2py(gy);
+    ctx.beginPath(); ctx.moveTo(pad.l,y); ctx.lineTo(W-pad.r,y); ctx.stroke();
+  }
+
+  // Modern axes with slight shadow
+  ctx.shadowColor = "rgba(0,0,0,0.1)";
+  ctx.shadowBlur = 2;
+  ctx.shadowOffsetY = 1;
+  ctx.strokeStyle = "#78909c";
+  ctx.lineWidth = 2;
+  ctx.beginPath();
+  ctx.moveTo(pad.l, pad.t);
+  ctx.lineTo(pad.l, H-pad.b);
+  ctx.lineTo(W-pad.r, H-pad.b);
+  ctx.stroke();
+  ctx.shadowColor = "transparent";
+  ctx.shadowBlur = 0;
+  ctx.shadowOffsetY = 0;
+
+  // Modern labels
+  ctx.fillStyle = "#263238";
+  ctx.font = "600 13px Roboto, system-ui";
+  ctx.textAlign = "center";
+  ctx.fillText(axisLabels.x, W/2, H-18);
+  ctx.save();
+  ctx.translate(18, H/2);
+  ctx.rotate(-Math.PI/2);
+  ctx.fillText(axisLabels.y, 0, 0);
+  ctx.restore();
+
+  // Ticks with better styling
+  ctx.fillStyle = "#78909c";
+  ctx.font = "12px Roboto, system-ui";
+  ctx.textAlign = "center";
+  for(let gx=Math.ceil(minX); gx<=Math.floor(maxX); gx++){
+    const x = x2px(gx);
+    ctx.fillText(String(gx), x, H-pad.b+20);
+  }
+  ctx.textAlign = "right";
+  for(let gy=Math.ceil(minY); gy<=Math.floor(maxY); gy++){
+    const y = y2py(gy);
+    ctx.fillText(String(gy), pad.l-10, y+4);
+  }
+
+  // Draw points with modern styling and glow effect
+  for(const r of rows){
+    const x = x2px(r.gpa);
+    const y = y2py(r.exp);
+    const isHovered = hoveredPoint && hoveredPoint.gpa === r.gpa && hoveredPoint.exp === r.exp;
+
+    // Main color
+    const col = (r.y===1) ? "#0097a7" : "#f4511e";
+
+    // Outer glow for hovered point
+    if(isHovered){
+      ctx.shadowColor = col;
+      ctx.shadowBlur = 15;
+      ctx.fillStyle = col;
+      ctx.globalAlpha = 0.3;
+      ctx.beginPath();
+      ctx.arc(x, y, 15, 0, Math.PI*2);
+      ctx.fill();
+      ctx.globalAlpha = 1;
+      ctx.shadowBlur = 0;
+    }
+
+    // Inner shadow for depth
+    const radialGrad = ctx.createRadialGradient(x-2, y-2, 0, x, y, 8);
+    radialGrad.addColorStop(0, col);
+    radialGrad.addColorStop(1, col + "dd");
+
+    // Point with shadow
+    ctx.shadowColor = "rgba(0,0,0,0.2)";
+    ctx.shadowBlur = 4;
+    ctx.shadowOffsetY = 2;
+    ctx.fillStyle = radialGrad;
+    ctx.beginPath();
+    ctx.arc(x, y, isHovered ? 8 : 6, 0, Math.PI*2);
+    ctx.fill();
+
+    // White border for contrast
+    ctx.shadowColor = "transparent";
+    ctx.shadowBlur = 0;
+    ctx.shadowOffsetY = 0;
+    ctx.strokeStyle = "#ffffff";
+    ctx.lineWidth = 2;
+    ctx.beginPath();
+    ctx.arc(x, y, isHovered ? 8 : 6, 0, Math.PI*2);
+    ctx.stroke();
+  }
+
+  hoverPoints[hoverKey] = rows.map(r=>({
+    x: x2px(r.gpa),
+    y: y2py(r.exp),
+    gpa: r.gpa,
+    exp: r.exp,
+    y: r.y,
+    yhat: r.yhat,
+    p: r.p,
+    z: r.z,
+    loss: r.loss,
+    correct: r.correct,
+  }));
+}
+
+/** -----------------------------
+ *  7) Heatmap (probability)
+ *  ----------------------------- */
+function drawHeatmapLog(params, rows){
+  const ctx = els.heat.getContext("2d");
+  const {W,H,pad,minX,maxX,minY,maxY,x2px,y2py} = getPlotGeometry(rows, els.heat);
+
+  ctx.clearRect(0,0,W,H);
+  ctx.fillStyle = "#fafbfc";
+  ctx.fillRect(0,0,W,H);
+
+  const imgW = W - pad.l - pad.r;
+  const imgH = H - pad.t - pad.b;
+  const image = ctx.createImageData(imgW, imgH);
+
+  const {b,w1,w2,t} = params;
+
+  for(let j=0; j<imgH; j++){
+    const y = maxY - (j/(imgH-1))*(maxY-minY);
+    for(let i=0; i<imgW; i++){
+      const x = minX + (i/(imgW-1))*(maxX-minX);
+      const z = b + w1*x + w2*y;
+      const u = sigmoid(z);
+      const [R,G,B,A] = colorMap(u);
+      const idx = 4*(j*imgW + i);
+      image.data[idx+0]=R;
+      image.data[idx+1]=G;
+      image.data[idx+2]=B;
+      image.data[idx+3]=A;
+    }
+  }
+  ctx.putImageData(image, pad.l, pad.t);
+
+  // Grid
+  ctx.strokeStyle = "rgba(0,0,0,0.06)";
+  ctx.lineWidth = 1;
+  for(let gx=Math.ceil(minX); gx<=Math.floor(maxX); gx++){
+    const x = x2px(gx);
+    ctx.beginPath(); ctx.moveTo(x,pad.t); ctx.lineTo(x,H-pad.b); ctx.stroke();
+  }
+  for(let gy=Math.ceil(minY); gy<=Math.floor(maxY); gy++){
+    const y = y2py(gy);
+    ctx.beginPath(); ctx.moveTo(pad.l,y); ctx.lineTo(W-pad.r,y); ctx.stroke();
+  }
+
+  // Axes
+  ctx.strokeStyle = "rgba(38,50,56,.4)";
+  ctx.lineWidth = 2;
+  ctx.beginPath();
+  ctx.moveTo(pad.l, pad.t);
+  ctx.lineTo(pad.l, H-pad.b);
+  ctx.lineTo(W-pad.r, H-pad.b);
+  ctx.stroke();
+
+  // Labels
+  ctx.fillStyle = "rgba(38,50,56,.7)";
+  ctx.font = "13px Roboto, system-ui";
+  ctx.textAlign = "center";
+  ctx.fillText(axisLabels.x, W/2, H-18);
+  ctx.save();
+  ctx.translate(18, H/2);
+  ctx.rotate(-Math.PI/2);
+  ctx.fillText(axisLabels.y, 0, 0);
+  ctx.restore();
+
+  // Points with hover effect
+  for(const r of rows){
+    const x = x2px(r.gpa);
+    const y = y2py(r.exp);
+    const isHovered = hoveredPoint && hoveredPoint.gpa === r.gpa && hoveredPoint.exp === r.exp;
+    const col = (r.y===1) ? "#0097a7" : "#f4511e";
+
+    // Glow effect for hovered point
+    if(isHovered){
+      ctx.shadowColor = col;
+      ctx.shadowBlur = 12;
+      ctx.globalAlpha = 0.4;
+      ctx.fillStyle = col;
+      ctx.beginPath();
+      ctx.arc(x, y, 12, 0, Math.PI*2);
+      ctx.fill();
+      ctx.globalAlpha = 1;
+      ctx.shadowBlur = 0;
+    }
+
+    ctx.fillStyle = col;
+    ctx.strokeStyle = "#ffffff";
+    ctx.lineWidth = 2;
+    ctx.shadowColor = "rgba(0,0,0,0.2)";
+    ctx.shadowBlur = 3;
+    ctx.shadowOffsetY = 1;
+    ctx.beginPath();
+    ctx.arc(x, y, isHovered ? 8 : 6, 0, Math.PI*2);
+    ctx.fill();
+    ctx.stroke();
+    ctx.shadowColor = "transparent";
+    ctx.shadowBlur = 0;
+    ctx.shadowOffsetY = 0;
+  }
+
+  // Store hover points for interactivity
+  hoverPoints.heat = rows.map(r=>({
+    x: x2px(r.gpa),
+    y: y2py(r.exp),
+    gpa: r.gpa,
+    exp: r.exp,
+    y: r.y,
+    yhat: r.yhat,
+    p: r.p,
+    z: r.z,
+    loss: r.loss,
+    correct: r.correct,
+  }));
+}
+
+function drawDecisionLog(params, rows){
+  const ctx = els.decision.getContext("2d");
+  const geom = getPlotGeometry(rows, els.decision);
+  const {W,H,pad,minX,maxX,minY,maxY,x2px,y2py} = geom;
+  ctx.clearRect(0,0,W,H);
+  ctx.fillStyle = "#fafbfc";
+  ctx.fillRect(0,0,W,H);
+
+  const imgW = W - pad.l - pad.r;
+  const imgH = H - pad.t - pad.b;
+  const image = ctx.createImageData(imgW, imgH);
+  const {b,w1,w2,t} = params;
+  for(let j=0; j<imgH; j++){
+    const y = maxY - (j/(imgH-1))*(maxY-minY);
+    for(let i=0; i<imgW; i++){
+      const x = minX + (i/(imgW-1))*(maxX-minX);
+      const p = sigmoid(b + w1*x + w2*y);
+      const cls = (p >= t) ? [0,151,167,180] : [244,81,30,180];
+      const idx = 4*(j*imgW + i);
+      image.data[idx+0]=cls[0];
+      image.data[idx+1]=cls[1];
+      image.data[idx+2]=cls[2];
+      image.data[idx+3]=cls[3];
+    }
+  }
+  ctx.putImageData(image, pad.l, pad.t);
+
+  // Grid
+  ctx.strokeStyle = "rgba(0,0,0,0.06)";
+  ctx.lineWidth = 1;
+  for(let gx=Math.ceil(minX); gx<=Math.floor(maxX); gx++){
+    const x = x2px(gx);
+    ctx.beginPath(); ctx.moveTo(x,pad.t); ctx.lineTo(x,H-pad.b); ctx.stroke();
+  }
+  for(let gy=Math.ceil(minY); gy<=Math.floor(maxY); gy++){
+    const y = y2py(gy);
+    ctx.beginPath(); ctx.moveTo(pad.l,y); ctx.lineTo(W-pad.r,y); ctx.stroke();
+  }
+
+  // Axes
+  ctx.strokeStyle = "rgba(38,50,56,.4)";
+  ctx.lineWidth = 2;
+  ctx.beginPath();
+  ctx.moveTo(pad.l, pad.t);
+  ctx.lineTo(pad.l, H-pad.b);
+  ctx.lineTo(W-pad.r, H-pad.b);
+  ctx.stroke();
+
+  // Labels
+  ctx.fillStyle = "rgba(38,50,56,.7)";
+  ctx.font = "13px Roboto, system-ui";
+  ctx.textAlign = "center";
+  ctx.fillText(axisLabels.x, W/2, H-18);
+  ctx.save();
+  ctx.translate(18, H/2);
+  ctx.rotate(-Math.PI/2);
+  ctx.fillText(axisLabels.y, 0, 0);
+  ctx.restore();
+
+  // Points with hover effect
+  for(const r of rows){
+    const x = x2px(r.gpa);
+    const y = y2py(r.exp);
+    const isHovered = hoveredPoint && hoveredPoint.gpa === r.gpa && hoveredPoint.exp === r.exp;
+    const col = (r.y===1) ? "#0097a7" : "#f4511e";
+
+    // Glow effect for hovered point
+    if(isHovered){
+      ctx.shadowColor = col;
+      ctx.shadowBlur = 12;
+      ctx.globalAlpha = 0.4;
+      ctx.fillStyle = col;
+      ctx.beginPath();
+      ctx.arc(x, y, 12, 0, Math.PI*2);
+      ctx.fill();
+      ctx.globalAlpha = 1;
+      ctx.shadowBlur = 0;
+    }
+
+    ctx.fillStyle = col;
+    ctx.strokeStyle = "#ffffff";
+    ctx.lineWidth = 2;
+    ctx.shadowColor = "rgba(0,0,0,0.2)";
+    ctx.shadowBlur = 3;
+    ctx.shadowOffsetY = 1;
+    ctx.beginPath();
+    ctx.arc(x, y, isHovered ? 8 : 6, 0, Math.PI*2);
+    ctx.fill();
+    ctx.stroke();
+    ctx.shadowColor = "transparent";
+    ctx.shadowBlur = 0;
+    ctx.shadowOffsetY = 0;
+  }
+
+  // Store hover points for interactivity
+  hoverPoints.decision = rows.map(r=>({
+    x: x2px(r.gpa),
+    y: y2py(r.exp),
+    gpa: r.gpa,
+    exp: r.exp,
+    y: r.y,
+    yhat: r.yhat,
+    p: r.p,
+    z: r.z,
+    loss: r.loss,
+    correct: r.correct,
+  }));
+}
+
+/** -----------------------------
+ *  8) Neural network model
+ *  ----------------------------- */
+function getParamsNN(){
+  return {
+    h1Bias: parseFloat(nnEls.h1Bias.value),
+    h1W1: parseFloat(nnEls.h1W1.value),
+    h1W2: parseFloat(nnEls.h1W2.value),
+    h2Bias: parseFloat(nnEls.h2Bias.value),
+    h2W1: parseFloat(nnEls.h2W1.value),
+    h2W2: parseFloat(nnEls.h2W2.value),
+    h3Bias: parseFloat(nnEls.h3Bias.value),
+    h3W1: parseFloat(nnEls.h3W1.value),
+    h3W2: parseFloat(nnEls.h3W2.value),
+    outBias: parseFloat(nnEls.outBias.value),
+    outH1: parseFloat(nnEls.outH1.value),
+    outH2: parseFloat(nnEls.outH2.value),
+    outH3: parseFloat(nnEls.outH3.value),
+    t: parseFloat(nnEls.thr.value),
+  };
+}
+
+function setParamsNN(p){
+  nnEls.h1Bias.value = p.h1Bias;
+  nnEls.h1W1.value  = p.h1W1;
+  nnEls.h1W2.value  = p.h1W2;
+  nnEls.h2Bias.value = p.h2Bias;
+  nnEls.h2W1.value  = p.h2W1;
+  nnEls.h2W2.value  = p.h2W2;
+  nnEls.h3Bias.value = p.h3Bias;
+  nnEls.h3W1.value  = p.h3W1;
+  nnEls.h3W2.value  = p.h3W2;
+  nnEls.outBias.value= p.outBias;
+  nnEls.outH1.value  = p.outH1;
+  nnEls.outH2.value  = p.outH2;
+  nnEls.outH3.value  = p.outH3;
+  nnEls.thr.value    = p.t;
+}
+
+function nnForward(params, gpa, exp){
+  const h1 = Math.tanh(params.h1Bias + params.h1W1*gpa + params.h1W2*exp);
+  const h2 = Math.tanh(params.h2Bias + params.h2W1*gpa + params.h2W2*exp);
+  const h3 = Math.tanh(params.h3Bias + params.h3W1*gpa + params.h3W2*exp);
+  const z = params.outBias + params.outH1*h1 + params.outH2*h2 + params.outH3*h3;
+  const p = sigmoid(z);
+  return {h1,h2,h3,z,p};
+}
+
+function computeAllNN(params){
+  const {t} = params;
+  const rows = data.map(r=>{
+    const {p,z} = nnForward(params, r.gpa, r.exp);
+    const yhat = (p >= t) ? 1 : 0;
+    const loss = logLoss(r.y, p);
+    const correct = (yhat === r.y) ? 1 : 0;
+    return {...r, z, p, yhat, loss, correct};
+  });
+
+  const acc = rows.reduce((s,r)=>s+r.correct,0) / rows.length;
+  const avgLoss = rows.reduce((s,r)=>s+r.loss,0) / rows.length;
+  return {rows, acc, avgLoss};
+}
+
+function drawHeatmapNN(params, rows){
+  const ctx = nnEls.heat.getContext("2d");
+  const {W,H,pad,minX,maxX,minY,maxY,x2px,y2py} = getPlotGeometry(rows, nnEls.heat);
+
+  ctx.clearRect(0,0,W,H);
+  ctx.fillStyle = "#fafbfc";
+  ctx.fillRect(0,0,W,H);
+
+  const imgW = W - pad.l - pad.r;
+  const imgH = H - pad.t - pad.b;
+  const image = ctx.createImageData(imgW, imgH);
+
+  for(let j=0; j<imgH; j++){
+    const y = maxY - (j/(imgH-1))*(maxY-minY);
+    for(let i=0; i<imgW; i++){
+      const x = minX + (i/(imgW-1))*(maxX-minX);
+      const {p} = nnForward(params, x, y);
+      const [R,G,B,A] = colorMap(p);
+      const idx = 4*(j*imgW + i);
+      image.data[idx+0]=R;
+      image.data[idx+1]=G;
+      image.data[idx+2]=B;
+      image.data[idx+3]=A;
+    }
+  }
+  ctx.putImageData(image, pad.l, pad.t);
+
+  // Grid
+  ctx.strokeStyle = "rgba(0,0,0,0.06)";
+  ctx.lineWidth = 1;
+  for(let gx=Math.ceil(minX); gx<=Math.floor(maxX); gx++){
+    const x = x2px(gx);
+    ctx.beginPath(); ctx.moveTo(x,pad.t); ctx.lineTo(x,H-pad.b); ctx.stroke();
+  }
+  for(let gy=Math.ceil(minY); gy<=Math.floor(maxY); gy++){
+    const y = y2py(gy);
+    ctx.beginPath(); ctx.moveTo(pad.l,y); ctx.lineTo(W-pad.r,y); ctx.stroke();
+  }
+
+  // Axes
+  ctx.strokeStyle = "rgba(38,50,56,.4)";
+  ctx.lineWidth = 2;
+  ctx.beginPath();
+  ctx.moveTo(pad.l, pad.t);
+  ctx.lineTo(pad.l, H-pad.b);
+  ctx.lineTo(W-pad.r, H-pad.b);
+  ctx.stroke();
+
+  // Labels
+  ctx.fillStyle = "rgba(38,50,56,.7)";
+  ctx.font = "13px Roboto, system-ui";
+  ctx.textAlign = "center";
+  ctx.fillText(axisLabels.x, W/2, H-18);
+  ctx.save();
+  ctx.translate(18, H/2);
+  ctx.rotate(-Math.PI/2);
+  ctx.fillText(axisLabels.y, 0, 0);
+  ctx.restore();
+
+  // Points with hover effect
+  for(const r of rows){
+    const x = x2px(r.gpa);
+    const y = y2py(r.exp);
+    const isHovered = hoveredPoint && hoveredPoint.gpa === r.gpa && hoveredPoint.exp === r.exp;
+    const col = (r.y===1) ? "#0097a7" : "#f4511e";
+
+    // Glow effect for hovered point
+    if(isHovered){
+      ctx.shadowColor = col;
+      ctx.shadowBlur = 12;
+      ctx.globalAlpha = 0.4;
+      ctx.fillStyle = col;
+      ctx.beginPath();
+      ctx.arc(x, y, 12, 0, Math.PI*2);
+      ctx.fill();
+      ctx.globalAlpha = 1;
+      ctx.shadowBlur = 0;
+    }
+
+    ctx.fillStyle = col;
+    ctx.strokeStyle = "#ffffff";
+    ctx.lineWidth = 2;
+    ctx.shadowColor = "rgba(0,0,0,0.2)";
+    ctx.shadowBlur = 3;
+    ctx.shadowOffsetY = 1;
+    ctx.beginPath();
+    ctx.arc(x, y, isHovered ? 8 : 6, 0, Math.PI*2);
+    ctx.fill();
+    ctx.stroke();
+    ctx.shadowColor = "transparent";
+    ctx.shadowBlur = 0;
+    ctx.shadowOffsetY = 0;
+  }
+
+  // Store hover points for interactivity
+  hoverPoints.nnHeat = rows.map(r=>({
+    x: x2px(r.gpa),
+    y: y2py(r.exp),
+    gpa: r.gpa,
+    exp: r.exp,
+    y: r.y,
+    yhat: r.yhat,
+    p: r.p,
+    z: r.z,
+    loss: r.loss,
+    correct: r.correct,
+  }));
+}
+
+function drawDecisionNN(params, rows){
+  const ctx = nnEls.decision.getContext("2d");
+  const geom = getPlotGeometry(rows, nnEls.decision);
+  const {W,H,pad,minX,maxX,minY,maxY,x2px,y2py} = geom;
+
+  ctx.clearRect(0,0,W,H);
+  ctx.fillStyle = "#fafbfc";
+  ctx.fillRect(0,0,W,H);
+
+  const imgW = W - pad.l - pad.r;
+  const imgH = H - pad.t - pad.b;
+  const image = ctx.createImageData(imgW, imgH);
+
+  for(let j=0; j<imgH; j++){
+    const y = maxY - (j/(imgH-1))*(maxY-minY);
+    for(let i=0; i<imgW; i++){
+      const x = minX + (i/(imgW-1))*(maxX-minX);
+      const {p} = nnForward(params, x, y);
+      const cls = (p >= params.t) ? [0,151,167,180] : [244,81,30,180];
+      const idx = 4*(j*imgW + i);
+      image.data[idx+0]=cls[0];
+      image.data[idx+1]=cls[1];
+      image.data[idx+2]=cls[2];
+      image.data[idx+3]=cls[3];
+    }
+  }
+  ctx.putImageData(image, pad.l, pad.t);
+
+  // Grid
+  ctx.strokeStyle = "rgba(0,0,0,0.06)";
+  ctx.lineWidth = 1;
+  for(let gx=Math.ceil(minX); gx<=Math.floor(maxX); gx++){
+    const x = x2px(gx);
+    ctx.beginPath(); ctx.moveTo(x,pad.t); ctx.lineTo(x,H-pad.b); ctx.stroke();
+  }
+  for(let gy=Math.ceil(minY); gy<=Math.floor(maxY); gy++){
+    const y = y2py(gy);
+    ctx.beginPath(); ctx.moveTo(pad.l,y); ctx.lineTo(W-pad.r,y); ctx.stroke();
+  }
+
+  // Axes
+  ctx.strokeStyle = "rgba(38,50,56,.4)";
+  ctx.lineWidth = 2;
+  ctx.beginPath();
+  ctx.moveTo(pad.l, pad.t);
+  ctx.lineTo(pad.l, H-pad.b);
+  ctx.lineTo(W-pad.r, H-pad.b);
+  ctx.stroke();
+
+  // Labels
+  ctx.fillStyle = "rgba(38,50,56,.7)";
+  ctx.font = "13px Roboto, system-ui";
+  ctx.textAlign = "center";
+  ctx.fillText(axisLabels.x, W/2, H-18);
+  ctx.save();
+  ctx.translate(18, H/2);
+  ctx.rotate(-Math.PI/2);
+  ctx.fillText(axisLabels.y, 0, 0);
+  ctx.restore();
+
+  // Points with hover effect
+  for(const r of rows){
+    const x = x2px(r.gpa);
+    const y = y2py(r.exp);
+    const isHovered = hoveredPoint && hoveredPoint.gpa === r.gpa && hoveredPoint.exp === r.exp;
+    const col = (r.y===1) ? "#0097a7" : "#f4511e";
+
+    // Glow effect for hovered point
+    if(isHovered){
+      ctx.shadowColor = col;
+      ctx.shadowBlur = 12;
+      ctx.globalAlpha = 0.4;
+      ctx.fillStyle = col;
+      ctx.beginPath();
+      ctx.arc(x, y, 12, 0, Math.PI*2);
+      ctx.fill();
+      ctx.globalAlpha = 1;
+      ctx.shadowBlur = 0;
+    }
+
+    ctx.fillStyle = col;
+    ctx.strokeStyle = "#ffffff";
+    ctx.lineWidth = 2;
+    ctx.shadowColor = "rgba(0,0,0,0.2)";
+    ctx.shadowBlur = 3;
+    ctx.shadowOffsetY = 1;
+    ctx.beginPath();
+    ctx.arc(x, y, isHovered ? 8 : 6, 0, Math.PI*2);
+    ctx.fill();
+    ctx.stroke();
+    ctx.shadowColor = "transparent";
+    ctx.shadowBlur = 0;
+    ctx.shadowOffsetY = 0;
+  }
+
+  // Store hover points for interactivity
+  hoverPoints.nnDecision = rows.map(r=>({
+    x: x2px(r.gpa),
+    y: y2py(r.exp),
+    gpa: r.gpa,
+    exp: r.exp,
+    y: r.y,
+    yhat: r.yhat,
+    p: r.p,
+    z: r.z,
+    loss: r.loss,
+    correct: r.correct,
+  }));
+}
+
+function updateNN(){
+  hideTooltip();
+  const p = getParamsNN();
+
+  nnEls.h1BiasVal.textContent = p.h1Bias.toFixed(2);
+  nnEls.h1W1Val.textContent  = p.h1W1.toFixed(2);
+  nnEls.h1W2Val.textContent  = p.h1W2.toFixed(2);
+  nnEls.h2BiasVal.textContent = p.h2Bias.toFixed(2);
+  nnEls.h2W1Val.textContent  = p.h2W1.toFixed(2);
+  nnEls.h2W2Val.textContent  = p.h2W2.toFixed(2);
+  nnEls.h3BiasVal.textContent = p.h3Bias.toFixed(2);
+  nnEls.h3W1Val.textContent  = p.h3W1.toFixed(2);
+  nnEls.h3W2Val.textContent  = p.h3W2.toFixed(2);
+  nnEls.outBiasVal.textContent= p.outBias.toFixed(2);
+  nnEls.outH1Val.textContent  = p.outH1.toFixed(2);
+  nnEls.outH2Val.textContent  = p.outH2.toFixed(2);
+  nnEls.outH3Val.textContent  = p.outH3.toFixed(2);
+  nnEls.thrVal.textContent    = p.t.toFixed(2);
+
+  const {rows, acc, avgLoss} = computeAllNN(p);
+  renderTable(rows, nnEls.tbody);
+  renderMetrics(acc, avgLoss, nnEls.accOut, nnEls.lossOut);
+  renderConfusion(computeConfusion(rows), nnEls.confTN, nnEls.confFP, nnEls.confFN, nnEls.confTP);
+  drawHeatmapNN(p, rows);
+  drawDecisionNN(p, rows);
+}
+
+/** -----------------------------
+ *  9) Tooltip interactions
+ *  ----------------------------- */
+function showTooltip(clientX, clientY, r){
+  const hasModelData = r.yhat !== undefined;
+  els.tooltip.innerHTML = hasModelData ? `
+    <div><span class="muted">x₁:</span> ${r.gpa.toFixed(2)} · <span class="muted">x₂:</span> ${r.exp.toFixed(2)}</div>
+    <div><span class="muted">y:</span> ${r.y} · <span class="muted">ŷ:</span> ${r.yhat}</div>
+    <div><span class="muted">prob:</span> ${(r.p*100).toFixed(1)}%</div>
+    <div><span class="muted">loss:</span> ${r.loss.toFixed(4)} ${r.correct ? '✓' : '✗'}</div>
+  ` : `
+    <div><span class="muted">x₁:</span> ${r.gpa.toFixed(2)}</div>
+    <div><span class="muted">x₂:</span> ${r.exp.toFixed(2)}</div>
+    <div><span class="muted">Label:</span> ${r.y === 1 ? 'Class 1' : 'Class 0'}</div>
+  `;
+  els.tooltip.style.left = `${clientX + 14}px`;
+  els.tooltip.style.top = `${clientY - 12}px`;
+  els.tooltip.classList.add("visible");
+  els.tooltip.setAttribute("aria-hidden","false");
+}
+
+function hideTooltip(){
+  els.tooltip.classList.remove("visible");
+  els.tooltip.setAttribute("aria-hidden","true");
+}
+
+function handleHover(evt, canvas, key){
+  const pts = hoverPoints[key] || [];
+  if(!pts.length){
+    hideTooltip();
+    hoveredPoint = null;
+    return;
+  }
+  const rect = canvas.getBoundingClientRect();
+
+  // Get mouse position in CSS pixels
+  const mouseX = evt.clientX - rect.left;
+  const mouseY = evt.clientY - rect.top;
+
+  // Convert to canvas coordinates
+  const scaleX = canvas.width / rect.width;
+  const scaleY = canvas.height / rect.height;
+  const canvasX = mouseX * scaleX;
+  const canvasY = mouseY * scaleY;
+
+  let best = null;
+  let bestDist = 20 * Math.max(scaleX, scaleY); // Scale the detection radius
+  for(const p of pts){
+    const d = Math.hypot(canvasX - p.x, canvasY - p.y);
+    if(d < bestDist){
+      best = p;
+      bestDist = d;
+    }
+  }
+
+  if(best){
+    showTooltip(evt.clientX, evt.clientY, best);
+    if(!hoveredPoint || hoveredPoint.gpa !== best.gpa || hoveredPoint.exp !== best.exp){
+      hoveredPoint = best;
+      // Redraw canvas to show hover effect
+      if(key === 'dataViz') updateDataViz();
+      else if(key === 'heat' || key === 'decision') updateLog();
+      else if(key === 'nnHeat' || key === 'nnDecision') updateNN();
+    }
+  } else {
+    hideTooltip();
+    if(hoveredPoint){
+      hoveredPoint = null;
+      if(key === 'dataViz') updateDataViz();
+      else if(key === 'heat' || key === 'decision') updateLog();
+      else if(key === 'nnHeat' || key === 'nnDecision') updateNN();
+    }
+  }
+}
+
+/** -----------------------------
+ * 10) Training (Gradient Descent)
+ *  ----------------------------- */
+function computeGradientsLog(params){
+  const {b,w1,w2} = params;
+  let db = 0, dw1 = 0, dw2 = 0;
+  const n = data.length;
+
+  for(const r of data){
+    const z = b + w1*r.gpa + w2*r.exp;
+    const p = sigmoid(z);
+    const error = p - r.y;
+    db += error;
+    dw1 += error * r.gpa;
+    dw2 += error * r.exp;
+  }
+
+  return {db: db/n, dw1: dw1/n, dw2: dw2/n};
+}
+
+function trainStepLog(){
+  const p = getParamsLog();
+  const lr = parseFloat(els.learningRate.value);
+  const grads = computeGradientsLog(p);
+
+  p.b -= lr * grads.db;
+  p.w1 -= lr * grads.dw1;
+  p.w2 -= lr * grads.dw2;
+
+  setParamsLog(p);
+  const {avgLoss} = computeAllLog(p);
+  lossHistory.push(avgLoss);
+  updateLog();
+  drawLossChart(lossHistory, els.lossChart);
+}
+
+// Animated training for logistic regression
+let logTrainingTimer = null;
+function trainLog(){
+  const iters = parseInt(els.iterations.value);
+  let currentIter = 0;
+
+  // Cancel any existing training
+  if(logTrainingTimer) {
+    clearInterval(logTrainingTimer);
+    logTrainingTimer = null;
+  }
+
+  // Run one step every 50ms to make it visible
+  logTrainingTimer = setInterval(() => {
+    if(currentIter < iters) {
+      trainStepLog();
+      currentIter++;
+    } else {
+      clearInterval(logTrainingTimer);
+      logTrainingTimer = null;
+    }
+  }, 50);
+}
+
+function computeGradientsNN(params){
+  let grads = {
+    h1Bias:0, h1W1:0, h1W2:0,
+    h2Bias:0, h2W1:0, h2W2:0,
+    h3Bias:0, h3W1:0, h3W2:0,
+    outBias:0, outH1:0, outH2:0, outH3:0
+  };
+  const n = data.length;
+
+  for(const r of data){
+    const h1 = Math.tanh(params.h1Bias + params.h1W1*r.gpa + params.h1W2*r.exp);
+    const h2 = Math.tanh(params.h2Bias + params.h2W1*r.gpa + params.h2W2*r.exp);
+    const h3 = Math.tanh(params.h3Bias + params.h3W1*r.gpa + params.h3W2*r.exp);
+    const z = params.outBias + params.outH1*h1 + params.outH2*h2 + params.outH3*h3;
+    const p = sigmoid(z);
+
+    const dz = p - r.y;
+    grads.outBias += dz;
+    grads.outH1 += dz * h1;
+    grads.outH2 += dz * h2;
+    grads.outH3 += dz * h3;
+
+    const dh1 = dz * params.outH1 * (1 - h1*h1);
+    const dh2 = dz * params.outH2 * (1 - h2*h2);
+    const dh3 = dz * params.outH3 * (1 - h3*h3);
+
+    grads.h1Bias += dh1;
+    grads.h1W1 += dh1 * r.gpa;
+    grads.h1W2 += dh1 * r.exp;
+
+    grads.h2Bias += dh2;
+    grads.h2W1 += dh2 * r.gpa;
+    grads.h2W2 += dh2 * r.exp;
+
+    grads.h3Bias += dh3;
+    grads.h3W1 += dh3 * r.gpa;
+    grads.h3W2 += dh3 * r.exp;
+  }
+
+  for(const k in grads){
+    grads[k] /= n;
+  }
+  return grads;
+}
+
+function trainStepNN(){
+  const p = getParamsNN();
+  const lr = parseFloat(nnEls.learningRate.value);
+  const grads = computeGradientsNN(p);
+
+  p.h1Bias -= lr * grads.h1Bias;
+  p.h1W1 -= lr * grads.h1W1;
+  p.h1W2 -= lr * grads.h1W2;
+  p.h2Bias -= lr * grads.h2Bias;
+  p.h2W1 -= lr * grads.h2W1;
+  p.h2W2 -= lr * grads.h2W2;
+  p.h3Bias -= lr * grads.h3Bias;
+  p.h3W1 -= lr * grads.h3W1;
+  p.h3W2 -= lr * grads.h3W2;
+  p.outBias -= lr * grads.outBias;
+  p.outH1 -= lr * grads.outH1;
+  p.outH2 -= lr * grads.outH2;
+  p.outH3 -= lr * grads.outH3;
+
+  setParamsNN(p);
+  const {avgLoss} = computeAllNN(p);
+  nnLossHistory.push(avgLoss);
+  updateNN();
+  drawLossChart(nnLossHistory, nnEls.lossChart);
+}
+
+// Animated training for NN with delay between steps
+let nnTrainingTimer = null;
+function trainNN(){
+  const iters = parseInt(nnEls.iterations.value);
+  let currentIter = 0;
+
+  // Cancel any existing training
+  if(nnTrainingTimer) {
+    clearInterval(nnTrainingTimer);
+    nnTrainingTimer = null;
+  }
+
+  // Run one step every 50ms to make it visible
+  nnTrainingTimer = setInterval(() => {
+    if(currentIter < iters) {
+      trainStepNN();
+      currentIter++;
+    } else {
+      clearInterval(nnTrainingTimer);
+      nnTrainingTimer = null;
+    }
+  }, 50);
+}
+
+function drawLossChart(history, canvas){
+  if(!history.length) return;
+
+  const ctx = canvas.getContext("2d");
+  const W = canvas.width, H = canvas.height;
+  const pad = {l:50, r:20, t:20, b:40};
+
+  ctx.clearRect(0,0,W,H);
+  ctx.fillStyle = "#fafbfc";
+  ctx.fillRect(0,0,W,H);
+
+  const maxLoss = Math.max(...history);
+  const minLoss = Math.min(...history);
+  const range = maxLoss - minLoss || 1;
+
+  const xScale = (W - pad.l - pad.r) / Math.max(history.length - 1, 1);
+  const yScale = (H - pad.t - pad.b) / range;
+
+  // Grid
+  ctx.strokeStyle = "rgba(0,0,0,0.06)";
+  ctx.lineWidth = 1;
+  for(let i=0; i<5; i++){
+    const y = pad.t + i * (H - pad.t - pad.b) / 4;
+    ctx.beginPath();
+    ctx.moveTo(pad.l, y);
+    ctx.lineTo(W - pad.r, y);
+    ctx.stroke();
+  }
+
+  // Axes
+  ctx.strokeStyle = "rgba(38,50,56,.4)";
+  ctx.lineWidth = 2;
+  ctx.beginPath();
+  ctx.moveTo(pad.l, pad.t);
+  ctx.lineTo(pad.l, H - pad.b);
+  ctx.lineTo(W - pad.r, H - pad.b);
+  ctx.stroke();
+
+  // Labels
+  ctx.fillStyle = "rgba(38,50,56,.7)";
+  ctx.font = "12px Roboto, system-ui";
+  ctx.textAlign = "center";
+  ctx.fillText("Iteration", W/2, H - 10);
+  ctx.save();
+  ctx.translate(15, H/2);
+  ctx.rotate(-Math.PI/2);
+  ctx.fillText("Loss", 0, 0);
+  ctx.restore();
+
+  // Y-axis labels
+  ctx.textAlign = "right";
+  for(let i=0; i<5; i++){
+    const val = maxLoss - i * range / 4;
+    const y = pad.t + i * (H - pad.t - pad.b) / 4;
+    ctx.fillText(val.toFixed(3), pad.l - 5, y + 4);
+  }
+
+  // Plot line
+  ctx.strokeStyle = "#ff6f00";
+  ctx.lineWidth = 2;
+  ctx.beginPath();
+  for(let i=0; i<history.length; i++){
+    const x = pad.l + i * xScale;
+    const y = H - pad.b - (history[i] - minLoss) * yScale;
+    if(i === 0) ctx.moveTo(x, y);
+    else ctx.lineTo(x, y);
+  }
+  ctx.stroke();
+
+  // Points
+  ctx.fillStyle = "#ff6f00";
+  for(let i=0; i<history.length; i++){
+    const x = pad.l + i * xScale;
+    const y = H - pad.b - (history[i] - minLoss) * yScale;
+    ctx.beginPath();
+    ctx.arc(x, y, 3, 0, Math.PI*2);
+    ctx.fill();
+  }
+}
+
+/** -----------------------------
+ * 11) Main render (logistic)
+ *  ----------------------------- */
+function updateLog(){
+  hideTooltip();
+  const p = getParamsLog();
+
+  els.biasVal.textContent = p.b.toFixed(2);
+  els.wGPAVal.textContent = p.w1.toFixed(2);
+  els.wExpVal.textContent = p.w2.toFixed(2);
+  els.thrVal.textContent  = p.t.toFixed(2);
+
+  const {rows, acc, avgLoss} = computeAllLog(p);
+  renderTable(rows, els.tbody);
+  renderMetrics(acc, avgLoss, els.accOut, els.lossOut);
+  renderConfusion(computeConfusion(rows), els.confTN, els.confFP, els.confFN, els.confTP);
+  drawHeatmapLog(p, rows);
+  drawDecisionLog(p, rows);
+}
+
+// Check URL parameters
+const urlParams = new URLSearchParams(window.location.search);
+if(urlParams.get('showTraining') === 'true'){
+  els.showTraining.checked = true;
+  els.trainingControls.classList.add('active');
+}
+
+// Listeners
+["bias","wGPA","wExp","thr"].forEach(id=>{
+  els[id].addEventListener("input", updateLog);
+});
+
+els.resetBtn.addEventListener("click", ()=>{
+  setParamsLog(defaults);
+  lossHistory = [];
+  updateLog();
+  drawLossChart(lossHistory, els.lossChart);
+});
+
+// Add hover listeners for heatmap and decision plots
+els.heat.addEventListener("mousemove", e=>handleHover(e, els.heat, "heat"));
+els.heat.addEventListener("mouseleave", ()=>{
+  hideTooltip();
+  hoveredPoint = null;
+  updateLog();
+});
+els.decision.addEventListener("mousemove", e=>handleHover(e, els.decision, "decision"));
+els.decision.addEventListener("mouseleave", ()=>{
+  hideTooltip();
+  hoveredPoint = null;
+  updateLog();
+});
+
+// Training controls
+els.showTraining.addEventListener("change", ()=>{
+  els.trainingControls.classList.toggle('active', els.showTraining.checked);
+});
+
+els.learningRate.addEventListener("input", ()=>{
+  els.learningRateVal.textContent = parseFloat(els.learningRate.value).toFixed(2);
+});
+
+els.iterations.addEventListener("input", ()=>{
+  els.iterationsVal.textContent = els.iterations.value;
+});
+
+els.stepBtn.addEventListener("click", trainStepLog);
+els.trainBtn.addEventListener("click", trainLog);
+
+// NN listeners
+["h1Bias","h1W1","h1W2","h2Bias","h2W1","h2W2","h3Bias","h3W1","h3W2","outBias","outH1","outH2","outH3","thr"].forEach(id=>{
+  nnEls[id].addEventListener("input", updateNN);
+});
+
+nnEls.resetBtn.addEventListener("click", ()=>{
+  setParamsNN(nnDefaults);
+  nnLossHistory = [];
+  updateNN();
+  drawLossChart(nnLossHistory, nnEls.lossChart);
+});
+
+// Add hover listeners for NN heatmap and decision plots
+nnEls.heat.addEventListener("mousemove", e=>handleHover(e, nnEls.heat, "nnHeat"));
+nnEls.heat.addEventListener("mouseleave", ()=>{
+  hideTooltip();
+  hoveredPoint = null;
+  updateNN();
+});
+nnEls.decision.addEventListener("mousemove", e=>handleHover(e, nnEls.decision, "nnDecision"));
+nnEls.decision.addEventListener("mouseleave", ()=>{
+  hideTooltip();
+  hoveredPoint = null;
+  updateNN();
+});
+
+// NN Training controls
+nnEls.showTraining.addEventListener("change", ()=>{
+  nnEls.trainingControls.classList.toggle('active', nnEls.showTraining.checked);
+});
+
+nnEls.learningRate.addEventListener("input", ()=>{
+  nnEls.learningRateVal.textContent = parseFloat(nnEls.learningRate.value).toFixed(2);
+});
+
+nnEls.iterations.addEventListener("input", ()=>{
+  nnEls.iterationsVal.textContent = nnEls.iterations.value;
+});
+
+nnEls.stepBtn.addEventListener("click", trainStepNN);
+nnEls.trainBtn.addEventListener("click", trainNN);
+
+// Data Tab functionality
+const dataVizCanvas = document.getElementById("dataViz");
+const datasetSelectMain = document.getElementById("datasetSelectMain");
+const totalPointsEl = document.getElementById("totalPoints");
+const class0CountEl = document.getElementById("class0Count");
+const class1CountEl = document.getElementById("class1Count");
+
+function updateDataViz(){
+  const {rows} = computeAllLog(getParamsLog());
+  drawScatterData(rows, dataVizCanvas, 'dataViz');
+
+  // Update statistics
+  totalPointsEl.textContent = data.length;
+  const class0 = data.filter(r => r.y === 0).length;
+  const class1 = data.filter(r => r.y === 1).length;
+  class0CountEl.textContent = class0;
+  class1CountEl.textContent = class1;
+}
+
+datasetSelectMain.addEventListener("change", ()=>{
+  setDataset(datasetSelectMain.value);
+  updateDataViz();
+  updateLog();
+  updateNN();
+});
+
+// Removed interactivity from data viz canvas
+
+// Tabs
+const tabButtons = Array.from(document.querySelectorAll(".tabBtn"));
+const tabPanels = Array.from(document.querySelectorAll(".tabPanel"));
+tabButtons.forEach(btn=>{
+  btn.addEventListener("click", ()=>{
+    const target = btn.dataset.tab;
+    tabButtons.forEach(b=>b.classList.toggle("active", b===btn));
+    tabPanels.forEach(p=>p.classList.toggle("active", p.id === target));
+    hideTooltip();
+    hoveredPoint = null;
+    if(target === "tab-data") updateDataViz();
+    else if(target === "tab-nn") updateNN();
+    else if(target === "tab-logistic") updateLog();
+  });
+});
+
+// Init
+setParamsLog(defaults);
+setParamsNN(nnDefaults);
+els.learningRateVal.textContent = parseFloat(els.learningRate.value).toFixed(2);
+els.iterationsVal.textContent = els.iterations.value;
+nnEls.learningRateVal.textContent = parseFloat(nnEls.learningRate.value).toFixed(2);
+nnEls.iterationsVal.textContent = nnEls.iterations.value;
+datasetSelectMain.value = currentDataset;
+updateDataViz();
+updateLog();
+updateNN();
+</script>
+</body>
+</html>
